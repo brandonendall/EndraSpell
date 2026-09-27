@@ -17,7 +17,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import java.util.Locale
-private val Navy=Color(0xFF08111F); private val Card=Color(0xFF12233B); private val Gold=Color(0xFFFFC94A); private val Cream=Color(0xFFFFF4D6)
+private val Navy=Color(0xFF061A12); private val Card=Color(0xFF0D2B1D); private val Gold=Color(0xFF8BC34A); private val Cream=Color(0xFFFFF4D6)
 class MainActivity:ComponentActivity(){override fun onCreate(savedInstanceState:Bundle?){super.onCreate(savedInstanceState);setContent{MaterialTheme{EndraSpellApp()}}}}
 @Composable fun EndraSpellApp(){var screen by remember{mutableStateOf("home")};var child by remember{mutableStateOf("James")};val context=LocalContext.current;var tts by remember{mutableStateOf<TextToSpeech?>(null)}
  DisposableEffect(Unit){val engine=TextToSpeech(context){if(it==TextToSpeech.SUCCESS)tts?.language=Locale.US};tts=engine;onDispose{engine.shutdown()}}
