@@ -3,6 +3,8 @@ import android.os.Bundle
 import android.speech.tts.TextToSpeech
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.compose.BackHandler
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.background
@@ -11,6 +13,10 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.shape.CutCornerShape
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.imageResource
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.foundation.selection.selectable
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -29,30 +35,135 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import java.util.Locale
 private val Navy=Color(0xFF020D08); private val Forest=Color(0xFF06331D); private val Card=Color(0xFF082B1B); private val Gold=Color(0xFFE7C65B); private val Leaf=Color(0xFF5EA83F); private val Cream=Color(0xFFFFF0C2); private val Parchment=Color(0xFFF3DFA7)
-class MainActivity:ComponentActivity(){override fun onCreate(savedInstanceState:Bundle?){super.onCreate(savedInstanceState);setContent{MaterialTheme{EndraSpellApp()}}}}
-@Composable fun EndraSpellApp(){var screen by remember{mutableStateOf("home")};var child by remember{mutableStateOf("James")};var spellingWords by remember{mutableStateOf(listOf("beautiful","because","different","favorite","important","people","school","thought","through","together"))};var heartWords by remember{mutableStateOf(listOf("the","said","was","have","what"))};val context=LocalContext.current;var tts by remember{mutableStateOf<TextToSpeech?>(null)}
- DisposableEffect(Unit){val engine=TextToSpeech(context){if(it==TextToSpeech.SUCCESS)tts?.language=Locale.US};engine.setSpeechRate(0.72f);tts=engine;onDispose{engine.shutdown()}}
- EnchantedFrame{when(screen){"home"->Home(child,{child=it},{screen="dashboard"});"dashboard"->Dashboard(child,{screen=it},{screen="home"});"words"->Words(spellingWords,heartWords,{spellingWords=it},{heartWords=it}){screen="dashboard"};"games"->Games({screen="dashboard"},{screen=it});"type"->TypeGame(tts){screen="games"};"quiz"->Quiz(tts){screen="dashboard"};"progress"->Progress{screen="dashboard"};"heart"->HeartWords(heartWords,{heartWords=it}){screen="words"};"scramble"->ScrambleGame{screen="games"};"missing"->MissingLetters{screen="games"};"search"->WordSearch{screen="games"};"settings"->Settings{screen="dashboard"};"help"->Help{screen="dashboard"};else->Dashboard(child,{screen=it},{screen="home"})}}}
-@Composable fun EnchantedFrame(content:@Composable BoxScope.()->Unit){Box(Modifier.fillMaxSize().background(Brush.verticalGradient(listOf(Color(0xFF03150B),Color(0xFF06331D),Color(0xFF010A06))))){Canvas(Modifier.fillMaxSize()){val w=size.width;val h=size.height;for(i in 0..18){val x=w*((i*37%91)+5)/100f;val y=h*((i*61%89)+5)/100f;drawCircle(Gold.copy(alpha=.30f),2f+(i%3),Offset(x,y))};drawLine(Gold.copy(alpha=.9f),Offset(8f,8f),Offset(w-8f,8f),3f);drawLine(Gold.copy(alpha=.9f),Offset(8f,h-8f),Offset(w-8f,h-8f),3f);drawLine(Gold.copy(alpha=.65f),Offset(8f,8f),Offset(8f,h-8f),2f);drawLine(Gold.copy(alpha=.65f),Offset(w-8f,8f),Offset(w-8f,h-8f),2f)};Box(Modifier.fillMaxSize().padding(horizontal=12.dp)){content()}}}
-@Composable fun CastleHeader(){Box(Modifier.fillMaxWidth().height(230.dp)){Canvas(Modifier.fillMaxSize()){val w=size.width;val h=size.height;val moon=Color(0xFFD7F59A);drawCircle(moon.copy(alpha=.20f),w*.17f,Offset(w*.72f,h*.27f));for(i in 0..13){drawCircle(Gold.copy(alpha=.45f),2f+(i%2),Offset(w*((i*31%83)+8)/100f,h*((i*47%45)+5)/100f))};val tree=Color(0xFF04170C);drawCircle(tree,w*.20f,Offset(w*.08f,h*.30f));drawCircle(tree,w*.18f,Offset(w*.92f,h*.27f));drawCircle(Color(0xFF0A3B21),w*.12f,Offset(w*.18f,h*.37f));drawCircle(Color(0xFF0A3B21),w*.12f,Offset(w*.82f,h*.38f));val base=h*.69f;val castle=Color(0xFF03170D);fun spire(cx:Float,tw:Float,th:Float){drawRect(castle,Offset(cx-tw/2,base-th),Size(tw,th));val top=base-th;val path=androidx.compose.ui.graphics.Path().apply{moveTo(cx-tw*.68f,top);lineTo(cx,top-tw*1.15f);lineTo(cx+tw*.68f,top);close()};drawPath(path,castle);drawLine(Gold.copy(alpha=.50f),Offset(cx-tw*.68f,top),Offset(cx,top-tw*1.15f),2f);drawLine(Gold.copy(alpha=.50f),Offset(cx,top-tw*1.15f),Offset(cx+tw*.68f,top),2f);drawCircle(Gold.copy(alpha=.8f),2.5f,Offset(cx,top+th*.35f))};spire(w*.31f,w*.065f,h*.27f);spire(w*.43f,w*.075f,h*.36f);spire(w*.54f,w*.095f,h*.46f);spire(w*.65f,w*.07f,h*.32f);spire(w*.74f,w*.06f,h*.24f);drawRect(castle,Offset(w*.25f,base-h*.13f),Size(w*.55f,h*.13f));drawLine(Gold.copy(alpha=.65f),Offset(w*.20f,base+2),Offset(w*.84f,base+2),3f);for(i in 0..7){val x=w*(.29f+i*.064f);drawCircle(Gold.copy(alpha=.65f),2.5f,Offset(x,base-h*.08f))};drawLine(Leaf.copy(alpha=.8f),Offset(0f,h*.77f),Offset(w,h*.77f),5f)};Column(Modifier.fillMaxSize(),horizontalAlignment=Alignment.CenterHorizontally,verticalArrangement=Arrangement.Bottom){Text("EndraSpell",color=Gold,fontSize=43.sp,fontWeight=FontWeight.ExtraBold);Text("Where words grow into magic",color=Cream,fontSize=15.sp);Text("❧  Enchanted Forest Academy  ❧",color=Gold,fontSize=14.sp);Spacer(Modifier.height(8.dp))}}}
-@Composable fun MagicBook(){Column(horizontalAlignment=Alignment.CenterHorizontally){Text("✨  ✦  ✨",color=Gold,fontSize=20.sp);Text("📖",fontSize=58.sp);Text("❧  ✧  ❧",color=Gold,fontSize=20.sp)}}
-@Composable fun ParchmentPanel(content:@Composable ColumnScope.()->Unit){androidx.compose.material3.Card(colors=CardDefaults.cardColors(containerColor=Parchment),shape=CutCornerShape(10.dp),modifier=Modifier.fillMaxWidth().border(2.dp,Gold,CutCornerShape(10.dp))){Column(Modifier.padding(18.dp),content=content)}}
-@Composable fun Header(title:String,back:(()->Unit)?=null){Row(Modifier.fillMaxWidth().padding(20.dp),verticalAlignment=Alignment.CenterVertically){if(back!=null)TextButton(onClick=back){Text("‹ Back",color=Gold)};Text("❧  $title  ❧",color=Gold,fontSize=26.sp,fontWeight=FontWeight.Bold,modifier=Modifier.padding(start=8.dp))}}
-@Composable fun GoldButton(text:String,onClick:()->Unit){Button(onClick=onClick,modifier=Modifier.fillMaxWidth().height(58.dp).padding(vertical=4.dp),colors=ButtonDefaults.buttonColors(containerColor=Gold,contentColor=Navy),shape=CutCornerShape(10.dp),border=androidx.compose.foundation.BorderStroke(2.dp,Gold)){Text("✦  $text  ✦",fontWeight=FontWeight.Bold,fontSize=17.sp)}}
-@Composable fun DarkButton(text:String,onClick:()->Unit){OutlinedButton(onClick=onClick,modifier=Modifier.fillMaxWidth().height(58.dp).padding(vertical=4.dp),shape=CutCornerShape(10.dp),colors=ButtonDefaults.outlinedButtonColors(containerColor=Card),border=androidx.compose.foundation.BorderStroke(1.dp,Gold.copy(alpha=.8f))){Text("🍃  $text",color=Cream,fontSize=16.sp)}}
-@Composable fun Home(child:String,choose:(String)->Unit,start:()->Unit){BoxWithConstraints(Modifier.fillMaxSize()){Image(painterResource(com.endra.spell.R.drawable.home_forest),contentDescription=null,modifier=Modifier.fillMaxSize(),contentScale=ContentScale.Crop);val h=maxHeight;Column(Modifier.fillMaxSize().padding(horizontal=28.dp),horizontalAlignment=Alignment.CenterHorizontally){Spacer(Modifier.height(h*.34f));Row(Modifier.fillMaxWidth().height(h*.125f),horizontalArrangement=Arrangement.spacedBy(14.dp)){Box(Modifier.weight(1f).fillMaxHeight().clickable{start()});Box(Modifier.weight(1f).fillMaxHeight().clickable{start()})};Spacer(Modifier.height(h*.012f));Row(Modifier.fillMaxWidth().height(h*.125f),horizontalArrangement=Arrangement.spacedBy(14.dp)){Box(Modifier.weight(1f).fillMaxHeight().clickable{start()});Box(Modifier.weight(1f).fillMaxHeight().clickable{start()})};Spacer(Modifier.height(h*.065f));Row(Modifier.fillMaxWidth().height(h*.055f),horizontalArrangement=Arrangement.spacedBy(8.dp)){listOf("James","Easton","Aiden").forEach{name->Box(Modifier.weight(1f).fillMaxHeight().clickable{choose(name)})}};Spacer(Modifier.height(h*.025f));Box(Modifier.fillMaxWidth().height(h*.075f).clickable{start()})}}}
-@Composable fun HomeTile(icon:String,label:String,modifier:Modifier=Modifier,onClick:()->Unit){Card(onClick=onClick,modifier=modifier.height(150.dp).border(2.dp,Gold,CutCornerShape(12.dp)),shape=CutCornerShape(12.dp),colors=CardDefaults.cardColors(containerColor=Card)){Column(Modifier.fillMaxSize().padding(12.dp),horizontalAlignment=Alignment.CenterHorizontally,verticalArrangement=Arrangement.Center){Text(icon,fontSize=38.sp);Text(label,color=Cream,fontSize=18.sp,fontWeight=FontWeight.Bold)}}}
-@Composable fun Dashboard(child:String,go:(String)->Unit,back:()->Unit){Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(18.dp)){Header("Hi, $child! ✨",back);Text("What would you like to practice?",color=Cream,fontSize=18.sp,modifier=Modifier.padding(8.dp));GoldButton("📚  My Words"){go("words")};DarkButton("🎮  Practice Games"){go("games")};DarkButton("🔊  Practice Quiz"){go("quiz")};DarkButton("🏆  My Progress"){go("progress")};DarkButton("⚙️  Settings"){go("settings")};DarkButton("❔  Help"){go("help")};Spacer(Modifier.height(22.dp));androidx.compose.material3.Card(colors=CardDefaults.cardColors(containerColor=Card),shape=RoundedCornerShape(22.dp),modifier=Modifier.fillMaxWidth()){Column(Modifier.padding(20.dp)){Text("This Week",color=Gold,fontWeight=FontWeight.Bold,fontSize=20.sp);Text("10 spelling words • 5 Heart Words",color=Cream,modifier=Modifier.padding(top=8.dp));Text("Tip: practice a little every day!",color=Cream.copy(alpha=.8f),modifier=Modifier.padding(top=10.dp))}}}}
-@Composable fun Words(spelling:List<String>,heart:List<String>,setSpelling:(List<String>)->Unit,setHeart:(List<String>)->Unit,back:()->Unit){var editing by remember{mutableStateOf(false)};var weeklyText by remember(spelling){mutableStateOf(spelling.joinToString("\n"))};var heartText by remember(heart){mutableStateOf(heart.joinToString("\n"))};Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(18.dp)){Header("🌿 My Words",back);if(editing){Text("Weekly Spelling Words",color=Gold,fontSize=20.sp,fontWeight=FontWeight.Bold);OutlinedTextField(weeklyText,{weeklyText=it},modifier=Modifier.fillMaxWidth().height(220.dp),label={Text("One word per line")},colors=OutlinedTextFieldDefaults.colors(focusedTextColor=Cream,unfocusedTextColor=Cream,focusedBorderColor=Gold,unfocusedBorderColor=Cream));Spacer(Modifier.height(16.dp));Text("❤️ Heart Words",color=Gold,fontSize=20.sp,fontWeight=FontWeight.Bold);OutlinedTextField(heartText,{heartText=it},modifier=Modifier.fillMaxWidth().height(180.dp),label={Text("Add Heart Words — one per line")},colors=OutlinedTextFieldDefaults.colors(focusedTextColor=Cream,unfocusedTextColor=Cream,focusedBorderColor=Gold,unfocusedBorderColor=Cream));GoldButton("Save Words"){setSpelling(weeklyText.lines().map{it.trim()}.filter{it.isNotEmpty()}.distinct());setHeart(heartText.lines().map{it.trim()}.filter{it.isNotEmpty()}.distinct());editing=false};DarkButton("Cancel"){editing=false}}else{Text("This Week's Spelling Words",color=Gold,fontSize=20.sp,fontWeight=FontWeight.Bold);spelling.forEachIndexed{i,w->Text("${i+1}.  $w",color=Cream,fontSize=18.sp,modifier=Modifier.padding(7.dp))};Spacer(Modifier.height(16.dp));Text("❤️ Heart Words",color=Gold,fontSize=20.sp,fontWeight=FontWeight.Bold);Text(heart.joinToString("   "),color=Cream,fontSize=18.sp,modifier=Modifier.padding(10.dp));DarkButton("❤️ Heart Words"){ };DarkButton("Previous Lists"){};GoldButton("+ Add / Edit Words"){editing=true}}}}
-@Composable fun Games(back:()->Unit,go:(String)->Unit){Column(Modifier.fillMaxSize().padding(18.dp).verticalScroll(rememberScrollState())){Header("🍃 Practice Games",back);GoldButton("⌨️  Type the Word"){go("type")};DarkButton("🔎  Spot the Right Word"){};DarkButton("🔀  Word Scramble"){go("scramble")};DarkButton("🧩  Missing Letters"){go("missing")};DarkButton("🔤  Word Search"){go("search")}}}
-@Composable fun TypeGame(tts:TextToSpeech?,back:()->Unit){var answer by remember{mutableStateOf("")};var msg by remember{mutableStateOf("")};val word="beautiful";Column(Modifier.fillMaxSize().padding(20.dp),horizontalAlignment=Alignment.CenterHorizontally){Header("🌱 Type the Word",back);Spacer(Modifier.height(30.dp));Text("🔊",fontSize=70.sp);GoldButton("Hear the Word"){tts?.speak(word,TextToSpeech.QUEUE_FLUSH,null,"word")};Spacer(Modifier.height(18.dp));OutlinedTextField(answer,{answer=it},label={Text("Type what you hear")},modifier=Modifier.fillMaxWidth(),singleLine=true,colors=OutlinedTextFieldDefaults.colors(focusedTextColor=Cream,unfocusedTextColor=Cream,focusedBorderColor=Gold,unfocusedBorderColor=Cream));GoldButton("Check"){msg=if(answer.trim().equals(word,true))"✨ Correct!" else "Try again — listen closely."};Text(msg,color=Gold,fontSize=20.sp,modifier=Modifier.padding(18.dp))}}
-@Composable fun Quiz(tts:TextToSpeech?,back:()->Unit){val words=listOf("beautiful","because","different","favorite","important");var index by remember{mutableIntStateOf(0)};var answer by remember{mutableStateOf("")};var correct by remember{mutableIntStateOf(0)};var done by remember{mutableStateOf(false)};Column(Modifier.fillMaxSize().padding(20.dp),horizontalAlignment=Alignment.CenterHorizontally){Header("📖 Practice Quiz",back);if(!done){Text("Word "+(index+1)+" of "+words.size,color=Cream,fontSize=18.sp);Spacer(Modifier.height(24.dp));GoldButton("🔊 Hear Word"){tts?.speak(words[index],TextToSpeech.QUEUE_FLUSH,null,"quiz")};OutlinedTextField(answer,{answer=it},label={Text("Spell the word")},modifier=Modifier.fillMaxWidth().padding(vertical=18.dp),singleLine=true,colors=OutlinedTextFieldDefaults.colors(focusedTextColor=Cream,unfocusedTextColor=Cream,focusedBorderColor=Gold,unfocusedBorderColor=Cream));GoldButton("Submit"){if(answer.trim().equals(words[index],true))correct++;answer="";if(index==words.lastIndex)done=true else index++}}else{Spacer(Modifier.height(60.dp));Text("Quiz Complete! ⭐",color=Gold,fontSize=30.sp,fontWeight=FontWeight.Bold);Text("$correct / "+words.size,color=Cream,fontSize=44.sp,modifier=Modifier.padding(24.dp));GoldButton("Done",back)}}}
-@Composable fun Progress(back:()->Unit){Column(Modifier.fillMaxSize().padding(18.dp).verticalScroll(rememberScrollState())){Header("🌳 My Progress",back);Text("⭐ Words Mastered",color=Gold,fontSize=22.sp,fontWeight=FontWeight.Bold);Text("0 — let's start practicing!",color=Cream,fontSize=18.sp,modifier=Modifier.padding(12.dp));Text("Recent Quiz Scores",color=Gold,fontSize=22.sp,fontWeight=FontWeight.Bold,modifier=Modifier.padding(top=24.dp));Text("Your scores will appear here after you take a quiz.",color=Cream,modifier=Modifier.padding(12.dp));Text("Needs More Practice",color=Gold,fontSize=22.sp,fontWeight=FontWeight.Bold,modifier=Modifier.padding(top=24.dp));Text("Mistakes will be saved here so you can learn from them.",color=Cream,modifier=Modifier.padding(12.dp))}}
+class MainActivity:ComponentActivity(){
+ override fun onCreate(savedInstanceState:Bundle?){
+  super.onCreate(savedInstanceState)
+  setContent { MaterialTheme { App22() } }
+ }
+}
+// Each illustrated panel uses the original approved artwork, with its own real
+// accessible control. Source rectangles avoid cropping or shifting hit targets.
+@Composable fun Home(child:String,choose:(String)->Unit,go:(String)->Unit){
+ val art=androidx.compose.ui.graphics.ImageBitmap.imageResource(R.drawable.home_approved)
+ BoxWithConstraints(Modifier.fillMaxSize().background(Navy).safeDrawingPadding()){
+  val landscape=maxWidth>maxHeight
+  if(landscape){
+   Row(Modifier.fillMaxSize()){
+    Artwork(art,0,32,992,545,Modifier.weight(0.43f).fillMaxHeight())
+    HomeControls(art,child,choose,go,Modifier.weight(0.57f).fillMaxHeight(),true)
+   }
+  }else{
+   Column(Modifier.fillMaxSize()){
+    Artwork(art,0,32,992,545,Modifier.fillMaxWidth().weight(0.34f))
+    HomeControls(art,child,choose,go,Modifier.fillMaxWidth().weight(0.66f),false)
+   }
+  }
+ }
+}
+@Composable private fun Artwork(art:androidx.compose.ui.graphics.ImageBitmap,left:Int,top:Int,right:Int,bottom:Int,modifier:Modifier=Modifier){
+ Canvas(modifier){drawImage(art,srcOffset=androidx.compose.ui.unit.IntOffset(left,top),srcSize=androidx.compose.ui.unit.IntSize(right-left,bottom-top),dstSize=androidx.compose.ui.unit.IntSize(size.width.toInt(),size.height.toInt()))}
+}
+@Composable private fun ArtControl(art:androidx.compose.ui.graphics.ImageBitmap,left:Int,top:Int,right:Int,bottom:Int,label:String,modifier:Modifier,onClick:()->Unit){
+ Artwork(art,left,top,right,bottom,modifier.clickable(role=androidx.compose.ui.semantics.Role.Button,onClick=onClick).semantics{contentDescription=label})
+}
+@Composable private fun HomeControls(art:androidx.compose.ui.graphics.ImageBitmap,child:String,choose:(String)->Unit,go:(String)->Unit,modifier:Modifier,compact:Boolean){
+ Column(modifier){
+  Row(Modifier.fillMaxWidth().weight(0.21f)){
+   ArtControl(art,0,545,496,750,"Practice Words",Modifier.weight(1f).fillMaxHeight()){go("quiz")}
+   ArtControl(art,496,545,992,750,"Heart Words",Modifier.weight(1f).fillMaxHeight()){go("hearts")}
+  }
+  Row(Modifier.fillMaxWidth().weight(0.21f)){
+   ArtControl(art,0,750,496,955,"Add or Edit Words",Modifier.weight(1f).fillMaxHeight()){go("edit")}
+   ArtControl(art,496,750,992,955,"Progress",Modifier.weight(1f).fillMaxHeight()){go("progress")}
+  }
+  Artwork(art,0,955,992,1060,Modifier.fillMaxWidth().weight(if(compact)0.06f else 0.10f).semantics{contentDescription="Choose your learner"})
+  Row(Modifier.fillMaxWidth().weight(if(compact)0.15f else 0.075f).padding(horizontal=12.dp),horizontalArrangement=Arrangement.spacedBy(6.dp)){
+   listOf("James","Easton","Aiden").forEach{name->
+    val active=child==name
+    Box(Modifier.weight(1f).fillMaxHeight().selectable(selected=active,role=androidx.compose.ui.semantics.Role.RadioButton,onClick={choose(name)}).background(if(active)Gold else Forest,RoundedCornerShape(50)).border(1.5.dp,Gold,RoundedCornerShape(50)),contentAlignment=Alignment.Center){
+     Text(learnerLabel(name),color=if(active)Navy else Cream,fontWeight=FontWeight.Bold,fontSize=16.sp,maxLines=1)
+    }
+   }
+  }
+  ArtControl(art,0,1125,992,1290,"Enter the Forest",Modifier.fillMaxWidth().weight(if(compact)0.21f else 0.18f)){go("dashboard")}
+  Artwork(art,0,1290,992,1586,Modifier.fillMaxWidth().weight(if(compact)0.06f else 0.225f))
+ }
+}
 
-@Composable fun PageIntro(icon:String,title:String,subtitle:String){Column(Modifier.fillMaxWidth(),horizontalAlignment=Alignment.CenterHorizontally){Text(icon,fontSize=48.sp);Text(title,color=Gold,fontSize=28.sp,fontWeight=FontWeight.ExtraBold);Text(subtitle,color=Cream,fontSize=15.sp,modifier=Modifier.padding(top=5.dp,bottom=16.dp))}}
-@Composable fun HeartWords(words:List<String>,save:(List<String>)->Unit,back:()->Unit){var text by remember(words){mutableStateOf(words.joinToString("\n"))};Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(18.dp)){Header("❤️ Heart Words",back);PageIntro("📖","Words to Know by Heart","These stay in your practice collection every week.");ParchmentPanel{Text("My Heart Words",color=Forest,fontSize=21.sp,fontWeight=FontWeight.Bold);words.forEach{Text("✦  $it",color=Forest,fontSize=18.sp,modifier=Modifier.padding(5.dp))}};Spacer(Modifier.height(16.dp));OutlinedTextField(text,{text=it},modifier=Modifier.fillMaxWidth().height(180.dp),label={Text("One word per line")},colors=OutlinedTextFieldDefaults.colors(focusedTextColor=Cream,unfocusedTextColor=Cream,focusedBorderColor=Gold,unfocusedBorderColor=Gold));GoldButton("Save Heart Words"){save(text.lines().map{it.trim()}.filter{it.isNotEmpty()}.distinct())}}}
-@Composable fun ScrambleGame(back:()->Unit){var answer by remember{mutableStateOf("")};var message by remember{mutableStateOf("")};val word="because";Column(Modifier.fillMaxSize().padding(18.dp),horizontalAlignment=Alignment.CenterHorizontally){Header("🔀 Word Scramble",back);PageIntro("✨","Unscramble the Magic","Put the letters back in the right order.");ParchmentPanel{Text("e  c  a  u  s  e  b",color=Forest,fontSize=27.sp,fontWeight=FontWeight.Bold,modifier=Modifier.align(Alignment.CenterHorizontally))};OutlinedTextField(answer,{answer=it},modifier=Modifier.fillMaxWidth().padding(top=20.dp),label={Text("Type the word")},singleLine=true,colors=OutlinedTextFieldDefaults.colors(focusedTextColor=Cream,unfocusedTextColor=Cream,focusedBorderColor=Gold,unfocusedBorderColor=Gold));GoldButton("Check My Spell"){message=if(answer.trim().equals(word,true))"✨ Correct! The spell is complete." else "🌿 Try again — you’re close."};Text(message,color=Gold,fontSize=19.sp,modifier=Modifier.padding(18.dp))}}
-@Composable fun MissingLetters(back:()->Unit){var answer by remember{mutableStateOf("")};var message by remember{mutableStateOf("")};Column(Modifier.fillMaxSize().padding(18.dp),horizontalAlignment=Alignment.CenterHorizontally){Header("🧩 Missing Letters",back);PageIntro("🌱","Restore the Word","Fill in the missing letters.");ParchmentPanel{Text("b e a _ t i f _ l",color=Forest,fontSize=29.sp,fontWeight=FontWeight.Bold,modifier=Modifier.align(Alignment.CenterHorizontally))};OutlinedTextField(answer,{answer=it},modifier=Modifier.fillMaxWidth().padding(top=20.dp),label={Text("Complete the word")},singleLine=true,colors=OutlinedTextFieldDefaults.colors(focusedTextColor=Cream,unfocusedTextColor=Cream,focusedBorderColor=Gold,unfocusedBorderColor=Gold));GoldButton("Check"){message=if(answer.trim().equals("beautiful",true))"✨ Correct!" else "🍃 Try again."};Text(message,color=Gold,fontSize=20.sp,modifier=Modifier.padding(18.dp))}}
-@Composable fun WordSearch(back:()->Unit){val rows=listOf("B E C A U S E","T H R O U G H","S C H O O L X","P E O P L E X","F A V O R I T E","T O G E T H E R");Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(18.dp)){Header("🔤 Word Search",back);PageIntro("🔎","Enchanted Word Search","Find this week’s words hidden in the forest.");ParchmentPanel{rows.forEach{Text(it,color=Forest,fontSize=21.sp,fontWeight=FontWeight.Bold,modifier=Modifier.fillMaxWidth().padding(7.dp))}};Text("Find: because • through • school • people • favorite • together",color=Cream,fontSize=16.sp,modifier=Modifier.padding(16.dp))}}
-@Composable fun Settings(back:()->Unit){var slow by remember{mutableStateOf(true)};var sparkle by remember{mutableStateOf(true)};Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(18.dp)){Header("⚙️ Settings",back);PageIntro("🪄","Magic Settings","Choose how EndraSpell feels during practice.");ParchmentPanel{Row(Modifier.fillMaxWidth(),verticalAlignment=Alignment.CenterVertically){Column(Modifier.weight(1f)){Text("Slower word reading",color=Forest,fontWeight=FontWeight.Bold,fontSize=18.sp);Text("Keeps spoken spelling words easy to hear.",color=Forest)};Switch(slow,{slow=it})};HorizontalDivider(Modifier.padding(vertical=10.dp));Row(Modifier.fillMaxWidth(),verticalAlignment=Alignment.CenterVertically){Column(Modifier.weight(1f)){Text("Magic effects",color=Forest,fontWeight=FontWeight.Bold,fontSize=18.sp);Text("Show encouraging sparkle messages.",color=Forest)};Switch(sparkle,{sparkle=it})}}}}
-@Composable fun Help(back:()->Unit){Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(18.dp)){Header("❔ Help",back);PageIntro("📚","Guide to the Academy","Everything your learner needs to get started.");ParchmentPanel{Text("Practice Words",color=Forest,fontWeight=FontWeight.Bold,fontSize=19.sp);Text("Add or edit the weekly spelling list. Previous weeks stay available for review.",color=Forest);Spacer(Modifier.height(12.dp));Text("Heart Words",color=Forest,fontWeight=FontWeight.Bold,fontSize=19.sp);Text("Add sight words that should remain available from week to week.",color=Forest);Spacer(Modifier.height(12.dp));Text("Practice & Games",color=Forest,fontWeight=FontWeight.Bold,fontSize=19.sp);Text("Hear words slowly, type answers, unscramble words, restore missing letters, and use the word search.",color=Forest);Spacer(Modifier.height(12.dp));Text("Progress",color=Forest,fontWeight=FontWeight.Bold,fontSize=19.sp);Text("Review scores, mastered words, and words that need more practice.",color=Forest)}}}
+@Composable private fun Scene(content:@Composable BoxWithConstraintsScope.()->Unit){
+ BoxWithConstraints(Modifier.fillMaxSize().background(Navy).safeDrawingPadding()){
+  Image(painterResource(R.drawable.castle_seamless),null,Modifier.fillMaxSize(),contentScale=ContentScale.FillBounds)
+  content()
+ }
+}
+
+@Composable private fun LearnerPlaque(name:String,onClick:()->Unit){
+ val art=androidx.compose.ui.graphics.ImageBitmap.imageResource(R.drawable.learner_plaque)
+ BoxWithConstraints(Modifier.fillMaxWidth()){
+  val plaqueHeight=(maxWidth/6).coerceIn(58.dp,96.dp)
+  Box(Modifier.fillMaxWidth().height(plaqueHeight).clickable(role=androidx.compose.ui.semantics.Role.Button,onClick=onClick),contentAlignment=Alignment.Center){
+   Canvas(Modifier.fillMaxSize()){
+    val sw=art.width/5
+    val fixed=sw.toFloat()/art.height*size.height
+    val flexible=(size.width-3*fixed)/2
+    var x=0f
+    for(i in 0..4){
+     val width=if(i%2==0)fixed else flexible
+     drawImage(art,srcOffset=androidx.compose.ui.unit.IntOffset(i*sw,0),srcSize=androidx.compose.ui.unit.IntSize(if(i==4)art.width-i*sw else sw,art.height),dstOffset=androidx.compose.ui.unit.IntOffset(x.toInt(),0),dstSize=androidx.compose.ui.unit.IntSize(width.toInt()+1,size.height.toInt()))
+     x+=width
+    }
+   }
+   Text(name,color=Cream,fontSize=21.sp,fontFamily=androidx.compose.ui.text.font.FontFamily.Serif,fontWeight=FontWeight.Bold,maxLines=1,textAlign=androidx.compose.ui.text.style.TextAlign.Center,modifier=Modifier.fillMaxWidth(.72f).offset(y=plaqueHeight*.035f))
+  }
+ }
+}
+
+@Composable fun LearnerHome(learners:List<LearningStore.Learner>,open:(String)->Unit,go:(String)->Unit){
+ var menu by remember{mutableStateOf(false)}
+ var page by rememberSaveable{mutableIntStateOf(0)}
+ Scene {
+  val shortScreen=maxHeight<500.dp
+  val perPage=if(shortScreen)1 else 3
+  val pages=((learners.size+perPage-1)/perPage).coerceAtLeast(1)
+  LaunchedEffect(pages){page=page.coerceAtMost(pages-1)}
+  val start=maxHeight*(if(shortScreen).20f else .39f)
+  Column(Modifier.align(Alignment.TopCenter).padding(top=start).fillMaxWidth(.82f).widthIn(max=760.dp),horizontalAlignment=Alignment.CenterHorizontally,verticalArrangement=Arrangement.spacedBy(6.dp)){
+   Text("✦ Choose your learner ✦",color=Gold,fontSize=21.sp,fontFamily=androidx.compose.ui.text.font.FontFamily.Serif,fontWeight=FontWeight.Bold,modifier=Modifier.padding(bottom=10.dp))
+   learners.drop(page*perPage).take(perPage).forEach{learner->LearnerPlaque(learner.name){open(learner.id)}}
+   Row(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.spacedBy(8.dp)){
+    ForestButton("Add Learner",Modifier.weight(1f)){go("learners_add")}
+    ForestButton("Remove Learner",Modifier.weight(1f)){go("learners_remove")}
+   }
+   if(pages>1)Row(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.SpaceBetween){
+    TextButton(onClick={page=(page-1).coerceAtLeast(0)},enabled=page>0){Text("‹ Previous",color=Gold)}
+    Text("${page+1} / $pages",color=Cream,modifier=Modifier.padding(top=12.dp))
+    TextButton(onClick={page=(page+1).coerceAtMost(pages-1)},enabled=page<pages-1){Text("Next ›",color=Gold)}
+   }
+  }
+  Box(Modifier.align(Alignment.TopEnd).padding(12.dp)){
+   TextButton(onClick={menu=true},modifier=Modifier.background(Forest,RoundedCornerShape(12.dp)).border(1.dp,Gold,RoundedCornerShape(12.dp)).semantics{contentDescription="Home menu"}){Text("☰",color=Gold,fontSize=25.sp)}
+   DropdownMenu(expanded=menu,onDismissRequest={menu=false}){
+    listOf("Settings" to "settings","Edit Learners" to "learners","Help" to "help").forEach{(title,route)->DropdownMenuItem(text={Text(title)},onClick={menu=false;go(route)})}
+   }
+  }
+ }
+}
+
+@Composable fun LearnerActivities(name:String,go:(String)->Unit,home:()->Unit){
+ val art=androidx.compose.ui.graphics.ImageBitmap.imageResource(R.drawable.activity_tiles)
+ Scene {
+  Row(Modifier.align(Alignment.TopStart).padding(10.dp).background(Forest.copy(alpha=.92f),RoundedCornerShape(12.dp)).border(1.dp,Gold,RoundedCornerShape(12.dp)),verticalAlignment=Alignment.CenterVertically){
+   TextButton(onClick=home){Text("‹ Learners",color=Gold)}
+   Text(name,color=Cream,fontSize=18.sp,maxLines=1,modifier=Modifier.padding(end=16.dp))
+  }
+  val tileWidth=minOf(maxWidth*.94f,maxHeight*.88f)
+  Column(Modifier.align(Alignment.TopCenter).padding(top=maxHeight*.43f).width(tileWidth)){
+   val w=art.width/2;val h=art.height/2
+   listOf(listOf("Practice Words" to "quiz","Heart Words" to "hearts"),listOf("Add or Edit Words" to "edit","Progress" to "progress")).forEachIndexed{row,items->
+    Row(Modifier.fillMaxWidth()){
+     items.forEachIndexed{col,(label,route)->ArtControl(art,col*w,row*h,(col+1)*w,(row+1)*h,label,Modifier.weight(1f).aspectRatio(w.toFloat()/h)){go(route)}}
+    }
+   }
+  }
+ }
+}
